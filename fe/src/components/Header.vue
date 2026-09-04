@@ -60,7 +60,6 @@ const handlePostCreated = (post: any) => {
       <a href="#">About</a>
       <a href="#">Contact</a>
 
-        <!-- Logged-in view -->
       <template v-if="isLoggedIn">
     
 

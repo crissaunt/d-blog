@@ -39,7 +39,6 @@ interface PostItem {
     id: number
     name: string
   } | null
-  status: string
   created_at: string
 }
 
@@ -56,7 +55,6 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Category form
 const newCategoryName = ref('')
 const newCategoryDescription = ref('')
 const isCreatingCategory = ref(false)
@@ -157,27 +155,6 @@ const deletePost = async (slug: string) => {
     fetchStats()
   } catch (e: any) {
     errorMessage.value = e.message || 'Error deleting post.'
-  }
-}
-
-const togglePostStatus = async (post: PostItem) => {
-  errorMessage.value = ''
-  successMessage.value = ''
-  const updatedStatus = post.status === 'published' ? 'draft' : 'published'
-  try {
-    const res = await fetch(`http://localhost:8000/api/blogs/${post.slug}/`, {
-      method: 'PATCH',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ status: updatedStatus }),
-    })
-    if (!res.ok) {
-      throw new Error('Failed to update post status.')
-    }
-    post.status = updatedStatus
-    successMessage.value = `Post status changed to ${updatedStatus}.`
-    fetchStats()
-  } catch (e: any) {
-    errorMessage.value = e.message || 'Error updating status.'
   }
 }
 
@@ -356,7 +333,7 @@ onMounted(() => {
             <li v-for="post in posts.slice(0, 5)" :key="post.id" class="py-2 text-sm flex justify-between items-center">
               <div>
                 <span class="font-medium">{{ post.title }}</span>
-                <span class="block text-xs">By {{ post.author?.username }} | {{ post.status }}</span>
+                <span class="block text-xs">By {{ post.author?.username }}</span>
               </div>
               <span class="text-xs">{{ new Date(post.created_at).toLocaleDateString() }}</span>
             </li>
@@ -404,14 +381,13 @@ onMounted(() => {
               <th class="p-3 font-bold border-r border-black">Title</th>
               <th class="p-3 font-bold border-r border-black">Author</th>
               <th class="p-3 font-bold border-r border-black">Category</th>
-              <th class="p-3 font-bold border-r border-black">Status</th>
               <th class="p-3 font-bold border-r border-black">Created</th>
               <th class="p-3 font-bold">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="posts.length === 0">
-              <td colspan="7" class="p-4 text-center">No posts found.</td>
+              <td colspan="6" class="p-4 text-center">No posts found.</td>
             </tr>
             <tr
               v-for="post in posts"
@@ -422,16 +398,8 @@ onMounted(() => {
               <td class="p-3 font-medium border-r border-gray-300">{{ post.title }}</td>
               <td class="p-3 border-r border-gray-300">{{ post.author?.username || 'Unknown' }}</td>
               <td class="p-3 border-r border-gray-300">{{ post.category?.name || '-' }}</td>
-              <td class="p-3 border-r border-gray-300 uppercase text-xs">{{ post.status }}</td>
               <td class="p-3 border-r border-gray-300">{{ new Date(post.created_at).toLocaleDateString() }}</td>
               <td class="p-3 space-x-2">
-                <button
-                  type="button"
-                  @click="togglePostStatus(post)"
-                  class="border border-black px-2 py-1 text-xs bg-white hover:bg-gray-100 cursor-pointer"
-                >
-                  Set {{ post.status === 'published' ? 'Draft' : 'Published' }}
-                </button>
                 <button
                   type="button"
                   @click="deletePost(post.slug)"

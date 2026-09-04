@@ -57,7 +57,6 @@ const handleRegister = async () => {
       throw new Error(errorMessage)
     }
 
-    // Automatically log in user with returned tokens
     if (data.tokens && data.user) {
       setAuth(data.user, data.tokens.access, data.tokens.refresh)
     }

@@ -6,9 +6,7 @@ const emit = defineEmits(['created', 'close'])
 const { accessToken } = useAuth()
 
 const title = ref('')
-const summary = ref('')
-const content = ref('')
-const status = ref('published')
+
 const message = ref('')
 const error = ref('')
 const isLoading = ref(false)
@@ -33,9 +31,7 @@ const handleCreatePost = async () => {
       },
       body: JSON.stringify({
         title: title.value,
-        summary: summary.value,
-        content: content.value,
-        status: status.value,
+       
       }),
     })
 
@@ -47,8 +43,7 @@ const handleCreatePost = async () => {
 
     message.value = 'Blog post created successfully!'
     title.value = ''
-    summary.value = ''
-    content.value = ''
+
     emit('created', data)
   } catch (err: any) {
     error.value = err.message || 'Failed to create blog post.'
@@ -73,32 +68,8 @@ const handleCreatePost = async () => {
         />
       </div>
 
-      <div>
-        <label for="post-summary">Summary / Excerpt:</label>
-        <textarea
-          id="post-summary"
-          v-model="summary"
-          rows="2"
-        ></textarea>
-      </div>
 
-      <div>
-        <label for="post-content">Content:</label>
-        <textarea
-          id="post-content"
-          v-model="content"
-          rows="6"
-          required
-        ></textarea>
-      </div>
 
-      <div>
-        <label for="post-status">Status:</label>
-        <select id="post-status" v-model="status">
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-        </select>
-      </div>
 
       <button type="submit" :disabled="isLoading">
         {{ isLoading ? 'Creating...' : 'Publish Post' }}

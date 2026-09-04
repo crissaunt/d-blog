@@ -1,32 +1,26 @@
+from django.contrib.auth import authenticate
 from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, Category, BlogPost
+from .models import User, BlogPost
 from .serializers import (
     RegisterSerializer,
     UserSerializer,
-    CustomTokenObtainPairSerializer,
-    LogoutSerializer,
-    CategorySerializer,
     BlogPostSerializer,
 )
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # Generate JWT tokens on registration
         refresh = RefreshToken.for_user(user)
 
         return Response({
@@ -39,18 +33,50 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-class LoginView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+class LoginView(APIView):
     permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response(
+                {"detail": "Must include both username and password."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if '@' in username:
+            user_obj = User.objects.filter(email__iexact=username).first()
+            if user_obj:
+                username = user_obj.username
+
+        user = authenticate(username=username, password=password)
+        if not user:
+            return Response(
+                {"detail": "wrong username or password"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        if not user.is_active:
+            return Response(
+                {"detail": "This user account is inactive."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": UserSerializer(user).data,
+        }, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = LogoutSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
         return Response(
             {"message": "Logged out successfully."},
             status=status.HTTP_200_OK
@@ -63,12 +89,6 @@ class CurrentUserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CategoryListCreateView(generics.ListCreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BlogPostListCreateView(generics.ListCreateAPIView):
@@ -96,7 +116,7 @@ class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
     permission_classes = [IsAuthorOrAdminOrReadOnly]
-    lookup_field = 'slug'
+    lookup_field = 'pk'
 
 
 class AdminStatsView(APIView):
@@ -104,18 +124,13 @@ class AdminStatsView(APIView):
 
     def get(self, request):
         total_posts = BlogPost.objects.count()
-        published_posts = BlogPost.objects.filter(status=BlogPost.Status.PUBLISHED).count()
-        draft_posts = BlogPost.objects.filter(status=BlogPost.Status.DRAFT).count()
         total_users = User.objects.count()
-        total_categories = Category.objects.count()
 
         return Response({
             'total_posts': total_posts,
-            'published_posts': published_posts,
-            'draft_posts': draft_posts,
             'total_users': total_users,
-            'total_categories': total_categories,
         })
+
 
 
 class AdminUserListView(generics.ListAPIView):

@@ -5,7 +5,6 @@ from .views import (
     LoginView,
     LogoutView,
     CurrentUserView,
-    CategoryListCreateView,
     BlogPostListCreateView,
     BlogPostDetailView,
     AdminStatsView,
@@ -19,14 +18,12 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
     path('auth/me/', CurrentUserView.as_view(), name='auth_me'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('categories/', CategoryListCreateView.as_view(), name='category_list_create'),
 
-    # Blog 
     path('blogs/', BlogPostListCreateView.as_view(), name='blog_list_create'),
-    path('blogs/<slug:slug>/', BlogPostDetailView.as_view(), name='blog_detail'),
+    path('blogs/<int:pk>/', BlogPostDetailView.as_view(), name='blog_detail'),
 
-    # Admin 
     path('admin/stats/', AdminStatsView.as_view(), name='admin_stats'),
     path('admin/users/', AdminUserListView.as_view(), name='admin_users'),
     path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin_user_detail'),
 ]
+

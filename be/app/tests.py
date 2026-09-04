@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
-from .models import User, BlogPost, Category
+from .models import User, BlogPost
 
 
 class AuthAndBlogAPITests(TestCase):
@@ -62,15 +62,13 @@ class AuthAndBlogAPITests(TestCase):
 
         post_data = {
             'title': 'My First Post',
-            'summary': 'A brief summary of my first blog post.',
             'content': 'This is the full markdown/text content of the blog post.',
-            'status': 'published'
         }
         response = self.client.post(self.blog_url, post_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'My First Post')
-        self.assertEqual(response.data['slug'], 'my-first-post')
         self.assertEqual(response.data['author']['username'], 'john_doe')
+
 
     def test_create_blog_post_unauthenticated_fails(self):
         post_data = {

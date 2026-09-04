@@ -11,7 +11,6 @@ export interface BlogPost {
   }
   summary?: string
   content: string
-  status: string
   created_at: string
 }
 
@@ -57,7 +56,7 @@ onMounted(() => {
     <div v-for="post in posts" :key="post.id" class="border p-4 my-3 rounded">
       <h3 class="text-lg font-bold">{{ post.title }}</h3>
       <p class="text-sm text-gray-600">
-        By {{ post.author?.username || 'Anonymous' }} | {{ new Date(post.created_at).toLocaleDateString() }} | Status: {{ post.status }}
+        By {{ post.author?.username || 'Anonymous' }}
       </p>
       <p v-if="post.summary" class="italic my-1 text-gray-700">{{ post.summary }}</p>
       <p class="mt-2">{{ post.content }}</p>
