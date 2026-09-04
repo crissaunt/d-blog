@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { API_BASE_URL } from '../config/api'
 
 export interface BlogPost {
   id: number
@@ -22,7 +23,7 @@ const fetchPosts = async () => {
   isLoading.value = true
   error.value = ''
   try {
-    const response = await fetch('http://localhost:8000/api/blogs/')
+    const response = await fetch(`${API_BASE_URL}/api/blogs/`)
     if (!response.ok) {
       throw new Error('Failed to fetch blog posts.')
     }

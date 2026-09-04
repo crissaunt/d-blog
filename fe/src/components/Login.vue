@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import { API_BASE_URL } from '../config/api'
 
 const emit = defineEmits(['success'])
 const { setAuth } = useAuth()
@@ -17,7 +18,7 @@ const handleLogin = async () => {
   isLoading.value = true
 
   try {
-    const response = await fetch('http://localhost:8000/api/auth/login/', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

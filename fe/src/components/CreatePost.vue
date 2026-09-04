@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import { API_BASE_URL } from '../config/api'
 
 const emit = defineEmits(['created', 'close'])
 const { accessToken } = useAuth()
@@ -23,7 +24,7 @@ const handleCreatePost = async () => {
   isLoading.value = true
 
   try {
-    const response = await fetch('http://localhost:8000/api/blogs/', {
+    const response = await fetch(`${API_BASE_URL}/api/blogs/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

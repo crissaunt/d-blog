@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { API_BASE_URL } from '../config/api'
 
 export interface AuthUser {
   id: number
@@ -33,7 +34,7 @@ export function useAuth() {
 
     if (refresh && access) {
       try {
-        await fetch('http://localhost:8000/api/auth/logout/', {
+        await fetch(`${API_BASE_URL}/api/auth/logout/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

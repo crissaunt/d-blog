@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import { API_BASE_URL } from '../config/api'
 
 interface Stats {
   total_posts: number
@@ -68,7 +69,7 @@ const getAuthHeaders = () => {
 
 const fetchStats = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/admin/stats/', {
+    const res = await fetch(`${API_BASE_URL}/api/admin/stats/`, {
       headers: getAuthHeaders(),
     })
     if (res.ok) {
@@ -81,7 +82,7 @@ const fetchStats = async () => {
 
 const fetchPosts = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/blogs/', {
+    const res = await fetch(`${API_BASE_URL}/api/blogs/`, {
       headers: getAuthHeaders(),
     })
     if (res.ok) {
@@ -95,7 +96,7 @@ const fetchPosts = async () => {
 
 const fetchCategories = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/categories/', {
+    const res = await fetch(`${API_BASE_URL}/api/categories/`, {
       headers: getAuthHeaders(),
     })
     if (res.ok) {
@@ -109,7 +110,7 @@ const fetchCategories = async () => {
 
 const fetchUsers = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/admin/users/', {
+    const res = await fetch(`${API_BASE_URL}/api/admin/users/`, {
       headers: getAuthHeaders(),
     })
     if (res.ok) {
@@ -143,7 +144,7 @@ const deletePost = async (slug: string) => {
   errorMessage.value = ''
   successMessage.value = ''
   try {
-    const res = await fetch(`http://localhost:8000/api/blogs/${slug}/`, {
+    const res = await fetch(`${API_BASE_URL}/api/blogs/${slug}/`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     })
@@ -164,7 +165,7 @@ const handleCreateCategory = async () => {
   successMessage.value = ''
   isCreatingCategory.value = true
   try {
-    const res = await fetch('http://localhost:8000/api/categories/', {
+    const res = await fetch(`${API_BASE_URL}/api/categories/`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
@@ -193,7 +194,7 @@ const deleteUser = async (userId: number) => {
   errorMessage.value = ''
   successMessage.value = ''
   try {
-    const res = await fetch(`http://localhost:8000/api/admin/users/${userId}/`, {
+    const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     })
